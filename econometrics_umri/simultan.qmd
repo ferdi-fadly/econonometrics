@@ -1,0 +1,85 @@
+# Model Persamaan Simultan
+
+## Definisi
+
+Persamaan simultan merupakan model yang mempunyai lebih dari satu variabel respon, dimana penyelesaiannya ditentukan oleh kesetimbangan antara gaya-gaya yang berlawanan. 
+
+Contoh umum dari masalah persamaan simultan ekonomi adalah model penawaran dan permintaan, dimana harga dan kuantitas saling bergantung dan ditentukan oleh interaksi antara penawaran dan permintaan.
+
+## Spesifikasi Model
+
+### Persamaan Struktural
+model ekonomi seperti persamaan permintaan dan penawaran mencakup beberapa variabel dependen (endogen) dalam setiap persamaan. Model seperti ini disebut bentuk struktural model.
+
+### Persamaan reduced
+Jika bentuk strukturalnya ditransformasikan sedemikian rupa sehingga setiap persamaan menunjukkan satu variabel terikat sebagai fungsi dari variabel bebas eksogen saja, maka bentuk baru tersebut disebut bentuk tereduksi . Bentuk tereduksi dapat diperkirakan dengan kuadrat terkecil, sedangkan bentuk struktural tidak dapat diperkirakan karena memuat variabel endogen di sisi kanannya.
+
+## Permasalahan Identifikasi
+
+Kondisi yang diperlukan untuk identifikasi mensyaratkan bahwa, agar masalah memiliki solusi, setiap persamaan dalam bentuk struktural sistem harus melewatkan setidaknya satu variabel eksogen yang ada dalam persamaan lainnya.
+
+## Langkah-langkah dengan Contoh 1
+
+Persamaan struktural permintaan dan penawaran (Persamaan 1 Dan 2) dirumuskan berdasarkan teori ekonomi; kuantitas dan harga bersifat endogen, dan semua variabel lainnya dianggap eksogen.
+
+$$
+q_d=\alpha_1 +\alpha_2 p +\alpha_3 ps +\alpha_4 di+e_d
+$$
+$$
+q_s=\beta_1 +\beta_2 p +\beta_3 pf+e_s
+$$
+
+```{r}
+rm(list=ls()) #Removes all items in Environment!
+library(systemfit)
+library(broom) #for `glance(`) and `tidy()`
+library(PoEdata) #for PoE4 dataset
+library(knitr) #for kable()
+```
+
+```{r}
+data("truffles", package="PoEdata")
+D <- q~p+ps+di
+S <- q~p+pf
+sys <- list(D,S)
+instr <- ~ps+di+pf
+truff.sys <- systemfit(sys, inst=instr, 
+                       method="2SLS", data=truffles)
+summary(truff.sys)
+```
+
+
+```{r}
+Q.red <- lm(q~ps+di+pf, data=truffles)
+P.red <- lm(p~ps+di+pf, data=truffles)
+kable(tidy(Q.red), digits=4,
+      caption="Reduced form for quantity")
+kable(tidy(P.red), digits=4,
+      caption="Reduced form for price")
+```
+
+## Contoh 2
+
+```{r}
+data("fultonfish", package="PoEdata")
+fishQ.ols <- lm(lquan~mon+tue+wed+thu+stormy, data=fultonfish)
+kable(tidy(fishQ.ols), digits=4,
+      caption="Reduced 'Q' equation for the fultonfish example")
+```
+
+```{r}
+fishP.ols <- lm(lprice~mon+tue+wed+thu+stormy, data=fultonfish)
+kable(tidy(fishP.ols), digits=4,
+      caption="Reduced 'P' equation for the fultonfish example")
+```
+
+```{r}
+fish.D <- lquan~lprice+mon+tue+wed+thu
+fish.S <- lquan~lprice+stormy
+fish.eqs <- list(fish.D, fish.S)
+fish.ivs <- ~mon+tue+wed+thu+stormy
+fish.sys <- systemfit(fish.eqs, method="2SLS", 
+              inst=fish.ivs, data=fultonfish)
+summary(fish.sys)
+```
+

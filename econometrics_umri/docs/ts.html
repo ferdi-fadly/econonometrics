@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Econometrics - 3&nbsp; Time Series Regression (e.g.&nbsp;ECM)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./simultan.html" rel="next">
+<link href="./regression.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+</head>
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg navbar-dark "><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Econometrics</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item compact">
+    <a class="nav-link" href="https://drive.google.com/file/d/1EwRIytRmzaxlz6Q_JrMpVQVFSJWulTcT/view?usp=drive_link" rel="" target=""><i class="bi bi-file-earmark-pdf" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+<div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./ts.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Regression (e.g. ECM)</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto"><div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About Me</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Pendahuluan</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Regresi Linear (Ordinary Least Squares)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ts.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Regression (e.g.&nbsp;ECM)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./simultan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Model Persamaan Simultan</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./panelgmm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Dynamic Panel Data Model</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Summary</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#stationeritas" id="toc-stationeritas" class="nav-link active" data-scroll-target="#stationeritas"><span class="header-section-number">3.1</span> Stationeritas</a></li>
+  <li>
+<a href="#uji-unit-root-untuk-stasioneritas" id="toc-uji-unit-root-untuk-stasioneritas" class="nav-link" data-scroll-target="#uji-unit-root-untuk-stasioneritas"><span class="header-section-number">3.2</span> Uji Unit Root untuk Stasioneritas</a>
+  <ul class="collapse">
+<li><a href="#ar1-model-autoregressive-orde-pertama" id="toc-ar1-model-autoregressive-orde-pertama" class="nav-link" data-scroll-target="#ar1-model-autoregressive-orde-pertama"><span class="header-section-number">3.2.1</span> AR1, Model Autoregressive Orde Pertama</a></li>
+  <li><a href="#adf-test-usa-funds" id="toc-adf-test-usa-funds" class="nav-link" data-scroll-target="#adf-test-usa-funds"><span class="header-section-number">3.2.2</span> ADF Test USA Funds</a></li>
+  <li><a href="#adf-test-usa-bonds" id="toc-adf-test-usa-bonds" class="nav-link" data-scroll-target="#adf-test-usa-bonds"><span class="header-section-number">3.2.3</span> ADF Test USA Bonds</a></li>
+  </ul>
+</li>
+  <li><a href="#differensiasi" id="toc-differensiasi" class="nav-link" data-scroll-target="#differensiasi"><span class="header-section-number">3.3</span> Differensiasi</a></li>
+  <li><a href="#kointegrasi" id="toc-kointegrasi" class="nav-link" data-scroll-target="#kointegrasi"><span class="header-section-number">3.4</span> Kointegrasi</a></li>
+  <li>
+<a href="#error-correction-model-ecm" id="toc-error-correction-model-ecm" class="nav-link" data-scroll-target="#error-correction-model-ecm"><span class="header-section-number">3.5</span> Error Correction Model (ECM)</a>
+  <ul class="collapse">
+<li><a href="#two-steps-engle-granger" id="toc-two-steps-engle-granger" class="nav-link" data-scroll-target="#two-steps-engle-granger"><span class="header-section-number">3.5.1</span> Two Steps Engle Granger</a></li>
+  <li><a href="#one-step-ecm" id="toc-one-step-ecm" class="nav-link" data-scroll-target="#one-step-ecm"><span class="header-section-number">3.5.2</span> One Step ECM</a></li>
+  <li><a href="#ardl" id="toc-ardl" class="nav-link" data-scroll-target="#ardl"><span class="header-section-number">3.5.3</span> ARDL</a></li>
+  </ul>
+</li>
+  </ul></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">
+<span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Time Series Regression (e.g.&nbsp;ECM)</span>
+</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header><section id="stationeritas" class="level2" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="stationeritas">
+<span class="header-section-number">3.1</span> Stationeritas</h2>
+<div class="cell">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">dynlm</span><span class="op">)</span> <span class="co">#for the `dynlm()` function</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: zoo</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'zoo'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric</code></pre>
+</div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">orcutt</span><span class="op">)</span> <span class="co"># for the `cochrane.orcutt()` function</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: lmtest</code></pre>
+</div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">nlWaldTest</span><span class="op">)</span> <span class="co"># for the `nlWaldtest()` function</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://zoo.R-Forge.R-project.org/">zoo</a></span><span class="op">)</span> <span class="co"># for time series functions (not much used here)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/abielr/pdfetch">pdfetch</a></span><span class="op">)</span> <span class="co"># for retrieving data (just mentioned here)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">lmtest</span><span class="op">)</span> <span class="co">#for `coeftest()` and `bptest()`.</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/">broom</a></span><span class="op">)</span> <span class="co">#for `glance(`) and `tidy()`</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">PoEdata</span><span class="op">)</span> <span class="co">#for PoE4 datasets</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-forge.r-project.org/projects/car/">car</a></span><span class="op">)</span> <span class="co">#for `hccm()` robust standard errors</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: carData</code></pre>
+</div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://sandwich.R-Forge.R-project.org/">sandwich</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/">knitr</a></span><span class="op">)</span> <span class="co">#for kable()</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://pkg.robjhyndman.com/forecast/">forecast</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Registered S3 method overwritten by 'quantmod':
+  method            from
+  as.zoo.data.frame zoo </code></pre>
+</div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:car':
+
+    recode</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+</div>
+<p>Time Series Data adalah data beberapa variabel pada suatu unit pengamatan (seperti individu, negara, atau perusahaan) ketika pengamatan mencakup beberapa periode. Korelasi antara pengamatan selanjutnya, pentingnya tatanan dalam data dan dinamika (nilai data masa lalu mempengaruhi nilai masa kini dan masa depan) merupakan fitur time series data yang tidak terjadi dalam data cross-sectional.</p>
+<p>Model Time Series mengasumsikan, selain asumsi regresi linier biasa, bahwa <strong>series-series data tersebut stasioner</strong>, yaitu distribusi error, serta korelasi antar error dalam beberapa periode adalah konstan sepanjang waktu. Distribusi yang konstan mensyaratkan, khususnya, bahwa variabel tersebut tidak menampilkan tren dalam mean atau variansnya; korelasi konstan menyiratkan tidak adanya pengelompokan pengamatan dalam periode tertentu.</p>
+<p><strong>Contoh Model Time Series:</strong></p>
+<ul>
+<li>Stationer, e.g: Regresi OLS, AutoRegressive Distributed Lag Model (ARDL), etc</li>
+<li>Tidak Stasioner, e.g: Error Correction Models (ECM)</li>
+</ul>
+<p>Deret waktu dikatakan nonstasioner jika distribusinya, khususnya mean, varians, atau kovarians berdasarkan waktu berubah seiring waktu. Deret waktu nonstasioner tidak dapat digunakan dalam model regresi karena dapat menimbulkan <strong>regresi palsu</strong> , yaitu hubungan yang salah karena, misalnya, tren umum pada variabel yang tidak terkait. Dua atau lebih rangkaian nonstasioner masih dapat menjadi bagian dari model regresi jika keduanya terkointegrasi, yaitu keduanya berada dalam hubungan yang stasioner.</p>
+<div class="cell">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"usa"</span>, package<span class="op">=</span><span class="st">"PoEdata"</span><span class="op">)</span></span>
+<span><span class="va">usa.ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">usa</span>, start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1984</span>,<span class="fl">1</span><span class="op">)</span>, end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2009</span>,<span class="fl">4</span><span class="op">)</span>,</span>
+<span>               frequency<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">Dgdp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">usa.ts</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">Dinf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">usa.ts</span><span class="op">[</span>,<span class="st">"inf"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">Df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">usa.ts</span><span class="op">[</span>,<span class="st">"f"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">Db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">usa.ts</span><span class="op">[</span>,<span class="st">"b"</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">usa.ts.df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/ts.union.html">ts.union</a></span><span class="op">(</span>gdp<span class="op">=</span><span class="va">usa.ts</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>, <span class="co"># package tseries</span></span>
+<span>                      inf<span class="op">=</span><span class="va">usa.ts</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>, </span>
+<span>                      f<span class="op">=</span><span class="va">usa.ts</span><span class="op">[</span>,<span class="fl">3</span><span class="op">]</span>,</span>
+<span>                      b<span class="op">=</span><span class="va">usa.ts</span><span class="op">[</span>,<span class="fl">4</span><span class="op">]</span>,</span>
+<span>                      <span class="va">Dgdp</span>,<span class="va">Dinf</span>,<span class="va">Df</span>,<span class="va">Db</span>,</span>
+<span>                      dframe<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span>                      </span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">gdp</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">Dgdp</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-2-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">inf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-2-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">Dinf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-2-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">f</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-2-5.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">Df</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-2-6.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">b</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-2-7.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">Db</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-2-8.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Contoh Dataset:</p>
+<div class="cell">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">)</span>, </span>
+<span>caption<span class="op">=</span><span class="st">"Time series data frame constructed with 'ts.union'"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Time series data frame constructed with ‘ts.union’</caption>
+<thead><tr class="header">
+<th style="text-align: right;">gdp</th>
+<th style="text-align: right;">inf</th>
+<th style="text-align: right;">f</th>
+<th style="text-align: right;">b</th>
+<th style="text-align: right;">Dgdp</th>
+<th style="text-align: right;">Dinf</th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">Db</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">3807.4</td>
+<td style="text-align: right;">9.47</td>
+<td style="text-align: right;">9.69</td>
+<td style="text-align: right;">11.19</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3906.3</td>
+<td style="text-align: right;">10.03</td>
+<td style="text-align: right;">10.56</td>
+<td style="text-align: right;">12.64</td>
+<td style="text-align: right;">98.9</td>
+<td style="text-align: right;">0.56</td>
+<td style="text-align: right;">0.87</td>
+<td style="text-align: right;">1.45</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3976.0</td>
+<td style="text-align: right;">10.83</td>
+<td style="text-align: right;">11.39</td>
+<td style="text-align: right;">12.64</td>
+<td style="text-align: right;">69.7</td>
+<td style="text-align: right;">0.80</td>
+<td style="text-align: right;">0.83</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4034.0</td>
+<td style="text-align: right;">11.51</td>
+<td style="text-align: right;">9.27</td>
+<td style="text-align: right;">11.10</td>
+<td style="text-align: right;">58.0</td>
+<td style="text-align: right;">0.68</td>
+<td style="text-align: right;">-2.12</td>
+<td style="text-align: right;">-1.54</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4117.2</td>
+<td style="text-align: right;">10.51</td>
+<td style="text-align: right;">8.48</td>
+<td style="text-align: right;">10.68</td>
+<td style="text-align: right;">83.2</td>
+<td style="text-align: right;">-1.00</td>
+<td style="text-align: right;">-0.79</td>
+<td style="text-align: right;">-0.42</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4175.7</td>
+<td style="text-align: right;">9.24</td>
+<td style="text-align: right;">7.92</td>
+<td style="text-align: right;">9.76</td>
+<td style="text-align: right;">58.5</td>
+<td style="text-align: right;">-1.27</td>
+<td style="text-align: right;">-0.56</td>
+<td style="text-align: right;">-0.92</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section><section id="uji-unit-root-untuk-stasioneritas" class="level2" data-number="3.2"><h2 data-number="3.2" class="anchored" data-anchor-id="uji-unit-root-untuk-stasioneritas">
+<span class="header-section-number">3.2</span> Uji Unit Root untuk Stasioneritas</h2>
+<section id="ar1-model-autoregressive-orde-pertama" class="level3" data-number="3.2.1"><h3 data-number="3.2.1" class="anchored" data-anchor-id="ar1-model-autoregressive-orde-pertama">
+<span class="header-section-number">3.2.1</span> AR1, Model Autoregressive Orde Pertama</h3>
+<p><strong>Spesifikasi Model</strong> <span class="math display">\[y_t=\rho y_{t-1}+v_t, |\rho|&lt;1\]</span></p>
+<p>Uji Dickey-Fuller untuk stasioneritas didasarkan pada proses AR(1) sebagaimana didefinisikan dalam Persamaan di atas.</p>
+<p><span class="math display">\[H_0: \rho=1, H_1:\rho&lt;1 \text{   (Variabel Stasioner})\]</span></p>
+<div class="cell">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">f</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://pkg.robjhyndman.com/forecast/reference/Acf.html">Acf</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">f</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section><section id="adf-test-usa-funds" class="level3" data-number="3.2.2"><h3 data-number="3.2.2" class="anchored" data-anchor-id="adf-test-usa-funds">
+<span class="header-section-number">3.2.2</span> ADF Test USA Funds</h3>
+<div class="cell">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">tseries</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tseries/man/adf.test.html">adf.test</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">f</span>, k <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  usa.ts.df$f
+Dickey-Fuller = -3.3726, Lag order = 10, p-value = 0.06283
+alternative hypothesis: stationary</code></pre>
+</div>
+</div>
+</section><section id="adf-test-usa-bonds" class="level3" data-number="3.2.3"><h3 data-number="3.2.3" class="anchored" data-anchor-id="adf-test-usa-bonds">
+<span class="header-section-number">3.2.3</span> ADF Test USA Bonds</h3>
+<div class="cell">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">b</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/acf.html">acf</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">b</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">tseries</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tseries/man/adf.test.html">adf.test</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">b</span>, k<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  usa.ts.df$b
+Dickey-Fuller = -2.9838, Lag order = 10, p-value = 0.1687
+alternative hypothesis: stationary</code></pre>
+</div>
+</div>
+</section></section><section id="differensiasi" class="level2" data-number="3.3"><h2 data-number="3.3" class="anchored" data-anchor-id="differensiasi">
+<span class="header-section-number">3.3</span> Differensiasi</h2>
+<p>Konsep yang erat kaitannya dengan stasioneritas adalah orde integrasi, yaitu berapa kali kita perlu mendiferensiasikan suatu deret hingga deret tersebut stasioner.</p>
+<ul>
+<li>I(0) - stasioner dalam level</li>
+<li>I(1) jika deret tersebut tidak stasioner pada tingkat-tingkatnya, tetapi stasioner pada perbedaan pertamanya.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">f</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/acf.html">acf</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-8-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">tseries</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tseries/man/adf.test.html">adf.test</a></span><span class="op">(</span><span class="va">df</span>, k<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in tseries::adf.test(df, k = 2): p-value smaller than printed p-value</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  df
+Dickey-Fuller = -4.1782, Lag order = 2, p-value = 0.01
+alternative hypothesis: stationary</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">b</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/acf.html">acf</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">tseries</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tseries/man/adf.test.html">adf.test</a></span><span class="op">(</span><span class="va">db</span>, k<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in tseries::adf.test(db, k = 2): p-value smaller than printed p-value</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  db
+Dickey-Fuller = -4.3976, Lag order = 2, p-value = 0.01
+alternative hypothesis: stationary</code></pre>
+</div>
+</div>
+</section><section id="kointegrasi" class="level2" data-number="3.4"><h2 data-number="3.4" class="anchored" data-anchor-id="kointegrasi">
+<span class="header-section-number">3.4</span> Kointegrasi</h2>
+<p>Dua seri terkointegrasi ketika trennya tidak berbeda jauh dan dalam beberapa hal serupa. Uji kointegrasi pada kenyataannya adalah uji stasioneritas Dickey-Fuler terhadap residu, dan hipotesis nolnya adalah nonkointegrasi. Dengan kata lain, kita ingin menolak hipotesis nol dalam uji kointegrasi, seperti yang kita inginkan dalam uji stasioneritas.</p>
+<p>Mari kita terapkan metode ini untuk menentukan keadaan kointegrasi antara rangkaian dan dalam kumpulan data</p>
+<div class="cell">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fb.dyn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/dynlm/man/dynlm.html">dynlm</a></span><span class="op">(</span><span class="va">b</span><span class="op">~</span><span class="va">f</span>, data <span class="op">=</span> <span class="va">usa</span><span class="op">)</span></span>
+<span><span class="va">ehat.fb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/residuals.html">resid</a></span><span class="op">(</span><span class="va">fb.dyn</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fb.dyn</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Time series regression with "numeric" data:
+Start = 1, End = 104
+
+Call:
+dynlm(formula = b ~ f, data = usa)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.8777 -0.4220 -0.0445  0.5062  1.8440 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  1.13983    0.17408   6.548  2.4e-09 ***
+f            0.91441    0.03108  29.421  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.8102 on 102 degrees of freedom
+Multiple R-squared:  0.8946,    Adjusted R-squared:  0.8936 
+F-statistic: 865.6 on 1 and 102 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">#db &lt;- diff(usa.ts.df$b)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">ehat.fb</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/acf.html">acf</a></span><span class="op">(</span><span class="va">ehat.fb</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="ts_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">tseries</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tseries/man/adf.test.html">adf.test</a></span><span class="op">(</span><span class="va">ehat.fb</span>, k<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  ehat.fb
+Dickey-Fuller = -4.0009, Lag order = 4, p-value = 0.01184
+alternative hypothesis: stationary</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">b</span><span class="op">=</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">b</span></span>
+<span><span class="va">f</span><span class="op">=</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">f</span></span>
+<span><span class="va">bfx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">b</span>,<span class="va">f</span><span class="op">)</span>, demean<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">tseries</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tseries/man/po.test.html">po.test</a></span><span class="op">(</span><span class="va">bfx</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Phillips-Ouliaris Cointegration Test
+
+data:  bfx
+Phillips-Ouliaris demeaned = -20.508, Truncation lag parameter = 1,
+p-value = 0.04986</code></pre>
+</div>
+</div>
+</section><section id="error-correction-model-ecm" class="level2" data-number="3.5"><h2 data-number="3.5" class="anchored" data-anchor-id="error-correction-model-ecm">
+<span class="header-section-number">3.5</span> Error Correction Model (ECM)</h2>
+<ul>
+<li>An Error Correction Model (ECM) merupakan metode standard untuk memodelkan data time series.</li>
+<li>The ECM makes it possible to deal with nonstationary data series and separates the long and short run.</li>
+</ul>
+<section id="two-steps-engle-granger" class="level3" data-number="3.5.1"><h3 data-number="3.5.1" class="anchored" data-anchor-id="two-steps-engle-granger">
+<span class="header-section-number">3.5.1</span> Two Steps Engle Granger</h3>
+<p><strong>Spesifikasi Model</strong></p>
+<p><strong>Tahap 1</strong></p>
+<p><span class="math display">\[y_t =\beta_0+\beta_1 x_t+u_t \]</span></p>
+<p><span class="math display">\[\hat{u_t}=y_t -\hat\beta_0-\hat\beta_1 x_t\]</span></p>
+<p>Dimana:</p>
+<ul>
+<li>
+<span class="math inline">\(\beta_1\)</span> merupakan Koefisien Model Long-run</li>
+</ul>
+<p><strong>Tahap 2</strong></p>
+<p><span class="math display">\[\Delta y_t=\beta_2+\beta_3 \Delta x_t - \pi_1 \hat u_{t-1}+\varepsilon_t \]</span></p>
+<p>Dimana:</p>
+<ul>
+<li>
+<span class="math inline">\(\pi_1\)</span> is the feedback effect, or the adjustment effect, or error correction coefficient and shows how much of the disequilibrium is being corrected.</li>
+<li>
+<span class="math inline">\(\varepsilon_t\)</span> merupakan white noise error term</li>
+</ul>
+<p>** Step 1 **</p>
+<div class="cell">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">b</span><span class="op">=</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">b</span></span>
+<span><span class="va">f</span><span class="op">=</span><span class="va">usa.ts.df</span><span class="op">$</span><span class="va">f</span></span>
+<span><span class="va">fb.dyn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/dynlm/man/dynlm.html">dynlm</a></span><span class="op">(</span><span class="va">b</span><span class="op">~</span><span class="va">f</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fb.dyn</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Time series regression with "ts" data:
+Start = 1984(1), End = 2009(4)
+
+Call:
+dynlm(formula = b ~ f)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.8777 -0.4220 -0.0445  0.5062  1.8440 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  1.13983    0.17408   6.548  2.4e-09 ***
+f            0.91441    0.03108  29.421  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.8102 on 102 degrees of freedom
+Multiple R-squared:  0.8946,    Adjusted R-squared:  0.8936 
+F-statistic: 865.6 on 1 and 102 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ect</span><span class="op">=</span><span class="va">fb.dyn</span><span class="op">$</span><span class="va">residuals</span></span>
+<span><span class="fu">tseries</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tseries/man/adf.test.html">adf.test</a></span><span class="op">(</span><span class="va">ect</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Augmented Dickey-Fuller Test
+
+data:  ect
+Dickey-Fuller = -4.0009, Lag order = 4, p-value = 0.01184
+alternative hypothesis: stationary</code></pre>
+</div>
+</div>
+<p>Signifikansi Menunjukkan adanya kointegrasi</p>
+<p>** Step 2 **</p>
+<div class="cell">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Set ECT dan Variabel penting lainnya menjadi time Series</span></span>
+<span><span class="va">ect</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">ect</span>,start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1984</span>,<span class="fl">1</span><span class="op">)</span>, end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2009</span>,<span class="fl">4</span><span class="op">)</span>,</span>
+<span>               frequency<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">ect1</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">ect</span>,start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1984</span>,<span class="fl">2</span><span class="op">)</span>, end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2009</span>,<span class="fl">4</span><span class="op">)</span>,</span>
+<span>               frequency<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">b</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">b</span>,start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1984</span>,<span class="fl">1</span><span class="op">)</span>, end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2009</span>,<span class="fl">4</span><span class="op">)</span>,</span>
+<span>               frequency<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">f</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">f</span>,start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1984</span>,<span class="fl">1</span><span class="op">)</span>, end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2009</span>,<span class="fl">4</span><span class="op">)</span>,</span>
+<span>               frequency<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">L1.b</span><span class="op">=</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/lag.html">lag</a></span><span class="op">(</span><span class="va">b</span>,<span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">L1.f</span><span class="op">=</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/lag.html">lag</a></span><span class="op">(</span><span class="va">f</span>,<span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">L1.b</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">L1.b</span>,start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1984</span>,<span class="fl">2</span><span class="op">)</span>, end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2009</span>,<span class="fl">4</span><span class="op">)</span>,</span>
+<span>               frequency<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">L1.f</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.html">ts</a></span><span class="op">(</span><span class="va">L1.f</span>,start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1984</span>,<span class="fl">2</span><span class="op">)</span>, end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2009</span>,<span class="fl">4</span><span class="op">)</span>,</span>
+<span>               frequency<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">tsdata</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/ts.union.html">ts.union</a></span><span class="op">(</span><span class="va">b</span>,<span class="va">f</span>,<span class="va">L1.b</span>,<span class="va">L1.f</span>,<span class="va">ect</span>,<span class="va">ect1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">tsdata</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            b     f  L1.b  L1.f      ect     ect1
+1984 Q1 11.19  9.69    NA    NA 1.189524       NA
+1984 Q2 12.64 10.56 11.19  9.69 1.843986 1.189524
+1984 Q3 12.64 11.39 12.64 10.56 1.085025 1.843986
+1984 Q4 11.10  9.27 12.64 11.39 1.483577 1.085025
+1985 Q1 10.68  8.48 11.10  9.27 1.785962 1.483577
+1985 Q2  9.76  7.92 10.68  8.48 1.378032 1.785962</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">regECM1</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span><span class="op">+</span><span class="va">ect1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">regECM1</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = diff(b) ~ diff(f) + ect1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.03574 -0.30858 -0.03668  0.24341  1.06092 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -0.03039    0.04265  -0.713   0.4778    
+diff(f)      0.69873    0.08128   8.597 1.16e-13 ***
+ect1        -0.12307    0.05502  -2.237   0.0275 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.4261 on 100 degrees of freedom
+Multiple R-squared:  0.426, Adjusted R-squared:  0.4145 
+F-statistic: 37.11 on 2 and 100 DF,  p-value: 8.811e-13</code></pre>
+</div>
+</div>
+</section><section id="one-step-ecm" class="level3" data-number="3.5.2"><h3 data-number="3.5.2" class="anchored" data-anchor-id="one-step-ecm">
+<span class="header-section-number">3.5.2</span> One Step ECM</h3>
+<p><span class="math display">\[\Delta y_t=\beta_2+\beta_3 \Delta x_t - \pi_1 \hat u_{t-1}+\varepsilon_t \]</span> <span class="math display">\[\Delta y_t=\beta_2+\beta_3 \Delta x_t - \pi_1(y_{t-1} -\hat\beta_0-\hat\beta_1 x_{t-1})+\varepsilon_t \]</span></p>
+<p><span class="math display">\[\Delta y_t=\beta_2+\beta_3 \Delta x_t - \pi_1(y_{t-1} -\hat\beta_0-\hat\beta_1 x_{t-1})+\varepsilon_t \]</span></p>
+<p><span class="math display">\[\Delta y_t=\beta_2+\beta_3 \Delta x_t - \pi_1y_{t-1} + \pi_1\hat\beta_0+ \pi_1\hat\beta_1 x_{t-1}+\varepsilon_t\]</span></p>
+<p>Susun kembali, dan misalkan jika <span class="math inline">\(\pi_1=-\alpha_1\)</span> dan <span class="math inline">\(\pi_1\beta_1=\alpha_2\)</span></p>
+<p><span class="math display">\[\Delta y_t=\alpha_0 + \alpha_1 y_{t-1} + \alpha_2 x_{t-1}+\alpha_3 \Delta x_t+\varepsilon_t\]</span></p>
+<p>Maka diperoleh hubungan</p>
+<p><span class="math display">\[\Delta y_t=\alpha_0 - \alpha_1 (y_{t-1} + \frac{\alpha_2}{\alpha_1} x_{t-1})+\alpha_3 \Delta x_t+\varepsilon_t\]</span></p>
+<p>Long-Run Coefficient Model <span class="math display">\[\hat \beta_1=-\frac{\alpha_2}{\alpha_1} \]</span></p>
+<div class="cell">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">regECM2</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">~</span><span class="va">L1.b</span><span class="op">+</span><span class="va">L1.f</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html">diff</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">regECM2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = diff(b) ~ L1.b + L1.f + diff(f))
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.06697 -0.30745 -0.05507  0.26760  1.13987 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  0.22636    0.11166   2.027   0.0453 *  
+L1.b        -0.12001    0.05476  -2.191   0.0308 *  
+L1.f         0.08565    0.05338   1.605   0.1118    
+diff(f)      0.68582    0.08133   8.433 2.82e-13 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.4238 on 99 degrees of freedom
+Multiple R-squared:  0.4379,    Adjusted R-squared:  0.4209 
+F-statistic: 25.71 on 3 and 99 DF,  p-value: 2.214e-12</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Homoskedastisitas Check</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-forge.r-project.org/projects/car/">car</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/car/man/ncvTest.html">ncvTest</a></span><span class="op">(</span><span class="va">regECM2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Non-constant Variance Score Test 
+Variance formula: ~ fitted.values 
+Chisquare = 0.000515675, Df = 1, p = 0.98188</code></pre>
+</div>
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Homoskedastisitas Check</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">lmtest</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/lmtest/man/bgtest.html">bgtest</a></span><span class="op">(</span><span class="va">regECM2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Breusch-Godfrey test for serial correlation of order up to 1
+
+data:  regECM2
+LM test = 2.2827, df = 1, p-value = 0.1308</code></pre>
+</div>
+</div>
+</section><section id="ardl" class="level3" data-number="3.5.3"><h3 data-number="3.5.3" class="anchored" data-anchor-id="ardl">
+<span class="header-section-number">3.5.3</span> ARDL</h3>
+<div class="cell">
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Natsiopoulos/ARDL">ARDL</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>To cite the ARDL package in publications:
+
+Use this reference to refer to the validity of the ARDL package.
+
+  Natsiopoulos, Kleanthis, and Tzeremes, Nickolaos G. (2022). ARDL
+  bounds test for cointegration: Replicating the Pesaran et al. (2001)
+  results for the UK earnings equation using R. Journal of Applied
+  Econometrics, 37(5), 1079-1090. https://doi.org/10.1002/jae.2919
+
+Use this reference to cite this specific version of the ARDL package.
+
+  Kleanthis Natsiopoulos and Nickolaos Tzeremes (2023). ARDL: ARDL, ECM
+  and Bounds-Test for Cointegration. R package version 0.2.4.
+  https://CRAN.R-project.org/package=ARDL</code></pre>
+</div>
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ardl1</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ARDL/man/ardl.html">ardl</a></span><span class="op">(</span><span class="va">b</span><span class="op">~</span><span class="va">f</span>, data<span class="op">=</span><span class="va">usa.ts.df</span>, order<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">ardl1</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Time series regression with "ts" data:
+Start = 2, End = 104
+
+Call:
+dynlm::dynlm(formula = full_formula, data = data, start = start, 
+    end = end)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.06697 -0.30745 -0.05507  0.26760  1.13987 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  0.22636    0.11166   2.027   0.0453 *  
+L(b, 1)      0.87999    0.05476  16.070  &lt; 2e-16 ***
+f            0.68582    0.08133   8.433 2.82e-13 ***
+L(f, 1)     -0.60017    0.08077  -7.431 3.89e-11 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.4238 on 99 degrees of freedom
+Multiple R-squared:  0.9706,    Adjusted R-squared:  0.9697 
+F-statistic:  1089 on 3 and 99 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/ARDL/man/bounds_f_test.html">bounds_f_test</a></span><span class="op">(</span><span class="va">ardl1</span>, case<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Bounds F-test (Wald) for no cointegration
+
+data:  d(b) ~ L(b, 1) + L(f, 1) + d(f)
+F = 3.5753, p-value = 0.2269
+alternative hypothesis: Possible cointegration
+null values:
+   k    T 
+   1 1000 </code></pre>
+</div>
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/ARDL/man/bounds_t_test.html">bounds_t_test</a></span><span class="op">(</span><span class="va">ardl1</span>, case<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Bounds t-test for no cointegration
+
+data:  d(b) ~ L(b, 1) + L(f, 1) + d(f)
+t = -2.1915, p-value = 0.3339
+alternative hypothesis: Possible cointegration
+null values:
+   k    T 
+   1 1000 </code></pre>
+</div>
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ecm</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ARDL/man/uecm.html">uecm</a></span><span class="op">(</span><span class="va">ardl1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">ecm</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Time series regression with "ts" data:
+Start = 2, End = 104
+
+Call:
+dynlm::dynlm(formula = full_formula, data = data, start = start, 
+    end = end)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.06697 -0.30745 -0.05507  0.26760  1.13987 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  0.22636    0.11166   2.027   0.0453 *  
+L(b, 1)     -0.12001    0.05476  -2.191   0.0308 *  
+L(f, 1)      0.08565    0.05338   1.605   0.1118    
+d(f)         0.68582    0.08133   8.433 2.82e-13 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.4238 on 99 degrees of freedom
+Multiple R-squared:  0.4379,    Adjusted R-squared:  0.4209 
+F-statistic: 25.71 on 3 and 99 DF,  p-value: 2.214e-12</code></pre>
+</div>
+</div>
+
+
+</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="./regression.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Regresi Linear (Ordinary Least Squares)</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./simultan.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Model Persamaan Simultan</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

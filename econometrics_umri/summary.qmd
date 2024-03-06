@@ -1,0 +1,15 @@
+# Summary
+
+-   Modelling itu merupakan seni
+
+-   "All Models are Wrong, but some are useful" - George Box (Statistician)
+
+-   Data terdiri atas 3:
+
+    -   Cross Section
+
+    -   Time Series
+
+    -   Panel
+
+-   Penggunaan Jenis data yang berbeda akan membawa implikasi penggunaan Alat Statistik yang berbeda pula.

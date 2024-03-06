@@ -1,0 +1,263 @@
+# Time Series Regression (e.g. ECM)
+
+## Stationeritas
+
+```{r}
+library(dynlm) #for the `dynlm()` function
+library(orcutt) # for the `cochrane.orcutt()` function
+library(nlWaldTest) # for the `nlWaldtest()` function
+library(zoo) # for time series functions (not much used here)
+library(pdfetch) # for retrieving data (just mentioned here)
+library(lmtest) #for `coeftest()` and `bptest()`.
+library(broom) #for `glance(`) and `tidy()`
+library(PoEdata) #for PoE4 datasets
+library(car) #for `hccm()` robust standard errors
+library(sandwich)
+library(knitr) #for kable()
+library(forecast)
+library(dplyr)
+```
+
+Time Series Data adalah data beberapa variabel pada suatu unit pengamatan (seperti individu, negara, atau perusahaan) ketika pengamatan mencakup beberapa periode. Korelasi antara pengamatan selanjutnya, pentingnya tatanan dalam data dan dinamika (nilai data masa lalu mempengaruhi nilai masa kini dan masa depan) merupakan fitur time series data yang tidak terjadi dalam data cross-sectional.
+
+Model Time Series mengasumsikan, selain asumsi regresi linier biasa, bahwa **series-series data tersebut stasioner**, yaitu distribusi error, serta korelasi antar error dalam beberapa periode adalah konstan sepanjang waktu. Distribusi yang konstan mensyaratkan, khususnya, bahwa variabel tersebut tidak menampilkan tren dalam mean atau variansnya; korelasi konstan menyiratkan tidak adanya pengelompokan pengamatan dalam periode tertentu.
+
+**Contoh Model Time Series:**
+
+-   Stationer, e.g: Regresi OLS, AutoRegressive Distributed Lag Model (ARDL), etc
+-   Tidak Stasioner, e.g: Error Correction Models (ECM)
+
+Deret waktu dikatakan nonstasioner jika distribusinya, khususnya mean, varians, atau kovarians berdasarkan waktu berubah seiring waktu. Deret waktu nonstasioner tidak dapat digunakan dalam model regresi karena dapat menimbulkan **regresi palsu** , yaitu hubungan yang salah karena, misalnya, tren umum pada variabel yang tidak terkait. Dua atau lebih rangkaian nonstasioner masih dapat menjadi bagian dari model regresi jika keduanya terkointegrasi, yaitu keduanya berada dalam hubungan yang stasioner.
+
+```{r}
+data("usa", package="PoEdata")
+usa.ts <- ts(usa, start=c(1984,1), end=c(2009,4),
+               frequency=4)
+Dgdp <- diff(usa.ts[,1])
+Dinf <- diff(usa.ts[,"inf"])
+Df <- diff(usa.ts[,"f"])
+Db <- diff(usa.ts[,"b"])
+usa.ts.df <- ts.union(gdp=usa.ts[,1], # package tseries
+                      inf=usa.ts[,2], 
+                      f=usa.ts[,3],
+                      b=usa.ts[,4],
+                      Dgdp,Dinf,Df,Db,
+                      dframe=TRUE)
+                      
+plot(usa.ts.df$gdp)
+plot(usa.ts.df$Dgdp)
+plot(usa.ts.df$inf)
+plot(usa.ts.df$Dinf)
+plot(usa.ts.df$f)
+plot(usa.ts.df$Df)
+plot(usa.ts.df$b)
+plot(usa.ts.df$Db)
+```
+
+Contoh Dataset:
+
+```{r}
+kable(head(usa.ts.df), 
+caption="Time series data frame constructed with 'ts.union'")
+```
+
+## Uji Unit Root untuk Stasioneritas
+
+### AR1, Model Autoregressive Orde Pertama
+
+**Spesifikasi Model** $$y_t=\rho y_{t-1}+v_t, |\rho|<1$$
+
+Uji Dickey-Fuller untuk stasioneritas didasarkan pada proses AR(1) sebagaimana didefinisikan dalam Persamaan di atas.
+
+$$H_0: \rho=1, H_1:\rho<1 \text{   (Variabel Stasioner})$$
+
+```{r}
+plot(usa.ts.df$f)
+Acf(usa.ts.df$f)
+```
+
+### ADF Test USA Funds
+
+```{r}
+tseries::adf.test(usa.ts.df$f, k = 10)
+```
+
+### ADF Test USA Bonds
+
+```{r}
+plot(usa.ts.df$b)
+acf(usa.ts.df$b)
+```
+
+```{r}
+tseries::adf.test(usa.ts.df$b, k=10)
+```
+
+## Differensiasi
+
+Konsep yang erat kaitannya dengan stasioneritas adalah orde integrasi, yaitu berapa kali kita perlu mendiferensiasikan suatu deret hingga deret tersebut stasioner.
+
+-   I(0) - stasioner dalam level
+-   I(1) jika deret tersebut tidak stasioner pada tingkat-tingkatnya, tetapi stasioner pada perbedaan pertamanya.
+
+```{r}
+df <- diff(usa.ts.df$f)
+plot(df)
+acf(df)
+tseries::adf.test(df, k=2)
+```
+
+```{r}
+db <- diff(usa.ts.df$b)
+plot(db)
+acf(db)
+tseries::adf.test(db, k=2)
+```
+
+## Kointegrasi
+
+Dua seri terkointegrasi ketika trennya tidak berbeda jauh dan dalam beberapa hal serupa. Uji kointegrasi pada kenyataannya adalah uji stasioneritas Dickey-Fuler terhadap residu, dan hipotesis nolnya adalah nonkointegrasi. Dengan kata lain, kita ingin menolak hipotesis nol dalam uji kointegrasi, seperti yang kita inginkan dalam uji stasioneritas.
+
+Mari kita terapkan metode ini untuk menentukan keadaan kointegrasi antara rangkaian dan dalam kumpulan data
+
+```{r}
+fb.dyn <- dynlm(b~f, data = usa)
+ehat.fb <- resid(fb.dyn)
+summary(fb.dyn)
+```
+
+```{r}
+#db <- diff(usa.ts.df$b)
+plot(ehat.fb)
+acf(ehat.fb)
+tseries::adf.test(ehat.fb, k=4)
+```
+
+```{r}
+b=usa.ts.df$b
+f=usa.ts.df$f
+bfx <- as.matrix(cbind(b,f), demean=FALSE)
+tseries::po.test(bfx)
+```
+
+## Error Correction Model (ECM)
+
+-   An Error Correction Model (ECM) merupakan metode standard untuk memodelkan data time series.
+-   The ECM makes it possible to deal with nonstationary data series and separates the long and short run.
+
+### Two Steps Engle Granger
+
+**Spesifikasi Model**
+
+**Tahap 1**
+
+$$y_t =\beta_0+\beta_1 x_t+u_t $$
+
+$$\hat{u_t}=y_t -\hat\beta_0-\hat\beta_1 x_t$$
+
+Dimana:
+
+-   $\beta_1$ merupakan Koefisien Model Long-run
+
+**Tahap 2**
+
+$$\Delta y_t=\beta_2+\beta_3 \Delta x_t - \pi_1 \hat u_{t-1}+\varepsilon_t $$
+
+Dimana:
+
+-   $\pi_1$ is the feedback effect, or the adjustment effect, or error correction coefficient and shows how much of the disequilibrium is being corrected.
+-   $\varepsilon_t$ merupakan white noise error term
+
+\*\* Step 1 \*\*
+
+```{r}
+b=usa.ts.df$b
+f=usa.ts.df$f
+fb.dyn <- dynlm(b~f)
+summary(fb.dyn)
+```
+```{r}
+ect=fb.dyn$residuals
+tseries::adf.test(ect)
+```
+
+Signifikansi Menunjukkan adanya kointegrasi
+
+\*\* Step 2 \*\*
+
+```{r}
+# Set ECT dan Variabel penting lainnya menjadi time Series
+ect=ts(ect,start=c(1984,1), end=c(2009,4),
+               frequency=4)
+ect1=ts(ect,start=c(1984,2), end=c(2009,4),
+               frequency=4)
+
+b=ts(b,start=c(1984,1), end=c(2009,4),
+               frequency=4)
+
+f=ts(f,start=c(1984,1), end=c(2009,4),
+               frequency=4)
+
+L1.b=stats::lag(b,-1)
+L1.f=stats::lag(f,-1)
+L1.b=ts(L1.b,start=c(1984,2), end=c(2009,4),
+               frequency=4)
+L1.f=ts(L1.f,start=c(1984,2), end=c(2009,4),
+               frequency=4)
+
+tsdata=ts.union(b,f,L1.b,L1.f,ect,ect1)
+head(tsdata)
+```
+
+```{r}
+regECM1=lm(diff(b)~diff(f)+ect1)
+summary(regECM1)
+```
+
+
+### One Step ECM
+
+$$\Delta y_t=\beta_2+\beta_3 \Delta x_t - \pi_1 \hat u_{t-1}+\varepsilon_t $$ $$\Delta y_t=\beta_2+\beta_3 \Delta x_t - \pi_1(y_{t-1} -\hat\beta_0-\hat\beta_1 x_{t-1})+\varepsilon_t $$
+
+$$\Delta y_t=\beta_2+\beta_3 \Delta x_t - \pi_1(y_{t-1} -\hat\beta_0-\hat\beta_1 x_{t-1})+\varepsilon_t $$
+
+$$\Delta y_t=\beta_2+\beta_3 \Delta x_t - \pi_1y_{t-1} + \pi_1\hat\beta_0+ \pi_1\hat\beta_1 x_{t-1}+\varepsilon_t$$
+
+Susun kembali, dan misalkan jika $\pi_1=-\alpha_1$ dan $\pi_1\beta_1=\alpha_2$
+
+$$\Delta y_t=\alpha_0 + \alpha_1 y_{t-1} + \alpha_2 x_{t-1}+\alpha_3 \Delta x_t+\varepsilon_t$$
+
+Maka diperoleh hubungan
+
+$$\Delta y_t=\alpha_0 - \alpha_1 (y_{t-1} + \frac{\alpha_2}{\alpha_1} x_{t-1})+\alpha_3 \Delta x_t+\varepsilon_t$$
+
+Long-Run Coefficient Model $$\hat \beta_1=-\frac{\alpha_2}{\alpha_1} $$
+
+```{r}
+regECM2=lm(diff(b)~L1.b+L1.f+diff(f))
+summary(regECM2)
+```
+
+```{r}
+# Homoskedastisitas Check
+library(car)
+ncvTest(regECM2)
+
+# Homoskedastisitas Check
+library(lmtest)
+bgtest(regECM2)
+```
+
+### ARDL
+
+```{r}
+library(ARDL)
+ardl1=ardl(b~f, data=usa.ts.df, order=c(1,1))
+summary(ardl1)
+
+bounds_f_test(ardl1, case=3)
+bounds_t_test(ardl1, case=3)
+
+ecm=uecm(ardl1)
+summary(ecm)
+```

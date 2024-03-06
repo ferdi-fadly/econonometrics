@@ -1,0 +1,338 @@
+# Regresi Linear (Ordinary Least Squares)
+
+```{r}
+# Packages Library yang digunakan
+library(bookdown)
+library(PoEdata)
+library(knitr)
+library(xtable)
+library(printr)
+library(stargazer)
+library(rmarkdown)
+library(lmtest) #for coeftest() and bptest().
+library(broom) #for glance() and tidy()
+library(PoEdata) #for PoE4 datasets
+library(car) #for hccm() robust standard errors
+library(sandwich)
+library(knitr)
+```
+
+## Spesifikasi Model Umum
+
+Model Regresi Linier mengasumsikan bahwa terdapat hubungan linier antara variabel terikat dan variabel bebas.
+
+$$y_i =\beta_0 +\beta_1 x_{1i}+\beta_2 x_{2i}+...+\beta_k x_{ki}+\varepsilon_i$$
+
+Dimana:
+
+-   $y_i= \text{variabel tidak bebas individu -i}$
+-   $x_{ki}= \text{variabel bebas ke-k individu -i}$
+-   $\varepsilon_{i}= \text{residual individu -i}$
+
+### Spesifikasi Model Regresi OLS
+
+-   $Linear: y=\beta_0+\beta X$
+-   $Semi-Log/Log-Lin: log(y)=\beta_0+\beta X$
+-   $Semi-Log/Lin-Log: log(y)=\beta_0+\beta log(X)$
+-   $Double-Log/Log-Log: log(y)=\beta_0+\beta log(X)$
+-   etc
+
+### Spesifikasi Model Contoh: Hubungan Pendapatan terhadap Pengeluaran Makanan
+
+```{r}
+library(PoEdata)
+data(food)
+head(food)
+```
+
+Data berjumlah `r dim(food)[1]` observasi. Variabel yang diamati ada `r dim(food)[2]`. Data selengkapnya dapat diakses pada link yang disediakan.
+
+```{r}
+data("food", package="PoEdata")
+plot(food$income, food$food_exp, 
+     ylim=c(0, max(food$food_exp)),
+     xlim=c(0, max(food$income)),
+     xlab="weekly income in $100", 
+     ylab="weekly food expenditure in $", 
+     type = "p",
+     main="Scatter plot untuk pendapatan terhadap pengeluaran makanan")
+```
+
+$$\text{Food Expenditure}_i=\beta_0+\beta_1 \text{Income}_i +\varepsilon_i$$ $$\varepsilon_i \sim \text{Normal}(0,\sigma^2) $$
+
+## Estimasi Parameter dengan Regresi
+
+```{r}
+mod1 <- lm(food_exp ~ income, data = food)
+b0 <- coef(mod1)[[1]]
+b1 <- coef(mod1)[[2]]
+smod1 <- summary(mod1)
+smod1
+```
+
+```{r}
+plot(food$income, food$food_exp, 
+     xlab="weekly income in $100", 
+     ylab="weekly food expenditure in $", 
+     ylim=c(0, max(food$food_exp)),
+     xlim=c(0, max(food$income)),
+     type = "p")
+abline(b0,b1)
+```
+
+##### Estimasi Selang Kepercayaan
+
+```{r}
+ci <- confint(mod1)
+print(ci)
+```
+
+## Pengujian Hipotesis, Asumsi, dan Kelayakan Model
+
+### Overall Test
+
+-   Gunakan p value dari F-Statistik
+
+$H_0 :$ Tidak ada variabel yang signifikan dalam model
+
+$H_1 :$ Minimal ada 1 variabel yang signifikan dalam model
+
+$\alpha=0.05$
+
+Keputusan: Tolak $H_0$, karena $p-value <\alpha$
+
+Kesimpulan: Dengan tingkat keyakinan 95%, cukup bukti untuk menyatakan bahwa minimal ada 1 variabel yang signifikan dalam model.
+
+### Partial Test
+
+-   Gunakan p value dari t-Statistik
+
+$H_0 : \beta_1=0$ variabel tidak signifikan dalam model
+
+$H_1 : \beta_1 \neq 0$ variabel signifikan dalam model
+
+$\alpha=0.05$
+
+Statistik Uji: $$t=\frac{\hat{\beta_1}-\beta_1}{se(\hat{\beta_1})}$$
+
+Keputusan: Tolak $H_0$, karena $p-value <\alpha$
+
+Kesimpulan: Dengan tingkat keyakinan 95%, cukup bukti untuk menyatakan bahwa variabel signifikan dalam model.
+
+### Pengecekan Asumsi/Diagnosa Residual-Residual Diagnostic
+
+#### Linearitas
+
+#### Independensi
+
+#### Normalitas
+
+```{r}
+hist(mod1$residuals)
+```
+
+#### Homoskedastisitas
+
+```{r}
+plot(mod1)
+```
+
+### Kelayakan Model
+
+-   Substansi
+-   Statistik, contohnya: $(R^2)$
+
+#### Koefisien Determinasi ($R^2$)
+
+$$SST=SSR+SSE$$
+
+```{r}
+anova1=anova(mod1)
+anova1
+r2=anova1$"Sum Sq"[1]/sum(anova1$"Sum Sq")
+```
+
+$SST$ = `r round(sum(anova1$"Sum Sq"),1)`
+
+$R^2$ = `r round(r2,3)`
+
+Artinya: `r round(r2*100,1)` % proporsi variasi y yang dapat dijelaskan oleh model/variabel x.
+
+### Contoh Pengecekan Asumsi yang sesuai/Ideal
+
+```{r}
+set.seed(12345)   #sets the seed for the random number generator
+x <- runif(300, 0, 10)
+e <- rnorm(300, 0, 1)
+y <- 1+x+e
+mod3 <- lm(y~x)
+ehat <- resid(mod3)
+plot(x,ehat, xlab="x", ylab="residuals")
+hist(ehat)
+plot(mod3)
+```
+
+## Analisis/Interpretasi/Peramalan
+
+### Peramalan
+
+```{r}
+newx <- data.frame(income = c(20, 25, 27))
+yhat <- predict(mod1, newx)
+names(yhat) <- c("income=$2000", "$2500", "$2700") 
+yhat  # prints the result
+```
+
+### Interpretasi
+
+```{r}
+mod1
+```
+
+-   Hati-hati menginterpretasikan Estimasi $\beta_0$
+
+-   Interpretasi dari Estimasi $\beta_1$
+
+Setiap Terjadi Kenaikan Income sebesar USD 100 (Kenaikannya sebesar 1 satuan, tetapi satuan x dalam hal ini income adalah USD 100), terjadi kenaikan pengeluaran makanan sebesar USD 10,21 (satuan y dalam hal ini adalah USD).
+
+#### Pembuktian Interpretasi
+
+##### Model Linear-Linear
+
+$$y=\beta_0+\beta X$$
+
+Misalkan nilai awal $y=y_0$, dan nilai awal $X=x_0$. dan nilai akhir $y=y_1$, dan nilai akhir $X=x_1$.
+
+Jelaskan hubungan x dan y jika $x_1=x_0+1$
+
+Persamaan awal
+
+$$y_0=\beta_0+\beta x_0$$
+
+Pembuktian 
+
+
+$$ y_1 = \beta_0 + \beta_1 x_1 $$
+$$= \beta_0 + \beta_1 (x_0 + 1) $$
+$$= \beta_0 + \beta_1 x_0 + \beta_1 $$
+$$= y_0 + \beta_1 $$
+$$\beta_1 = y_1 - y_0 $$
+$$= \Delta y$$
+
+
+Sehingga $\beta_1=\Delta y$ **Interpretasi** $\beta_1$
+
+Ketika X meningkat sebesar 1 satuan x, maka terjadi perubahan pada y sebesar $\beta_1$ satuan y.
+
+##### Model Linear-Log
+
+##### Model Log-Linear
+
+##### Model Log-Log
+
+## Extras: Model Log-log
+
+```{r}
+# Calculating log-log demand for chicken
+data("newbroiler", package="PoEdata")
+mod6 <- lm(log(q)~log(p), data=newbroiler)
+b1 <- coef(mod6)[[1]]
+b2 <- coef(mod6)[[2]]
+smod6 <- summary(mod6)
+tbl <- data.frame(xtable(smod6))
+kable(tbl, caption="Model Hubungan Harga terhadap Permintaan Ayam")
+```
+
+```{r}
+# Drawing the fitted values of the log-log equation
+ngrid <- 20 # number of drawing points 
+xmin <- min(newbroiler$p)
+xmax <- max(newbroiler$p)
+step <- (xmax-xmin)/ngrid # grid dimension
+xp <- seq(xmin, xmax, step)
+predicty=exp(b1+b2*log(xp))
+plot(newbroiler$p, newbroiler$q, ylim=c(10,60),
+     xlab="price", ylab="quantity")
+lines(predicty~xp, lty=1, col="black")
+```
+
+## Extras 2: Model dengan Asumsi Homoskedastisitas yang terlanggar
+
+Karena adanya heteroskedastisitas membuat kesalahan standar kuadrat terkecil menjadi keliru, maka diperlukan metode lain untuk menghitung Regresi.
+
+```{r}
+library(car)
+foodeq <- lm(food_exp~income,data=food)
+kable(tidy(foodeq),caption="Regular standard errors in the 'food' equation")
+cov1 <- hccm(foodeq, type="hc1") #needs package 'car'
+food.HC1 <- coeftest(foodeq, vcov.=cov1)
+kable(tidy(food.HC1),caption="Robust (HC1) standard errors in the 'food' equation")
+```
+
+```{r}
+w <- 1/food$income
+food.wls <- lm(food_exp~income, weights=w, data=food)
+vcvfoodeq <- coeftest(foodeq, vcov.=cov1)
+kable(tidy(foodeq), 
+  caption="OLS estimates for the 'food' equation")
+```
+
+```{r}
+kable(tidy(food.wls),
+  caption="WLS estimates for the 'food' equation" )
+```
+
+```{r}
+kable(tidy(vcvfoodeq),caption=
+"OLS estimates for the 'food' equation with robust standard errors" )
+```
+
+```{r}
+data("food", package="PoEdata")
+food.ols <- lm(food_exp~income, data=food)
+ehatsq <- resid(food.ols)^2
+sighatsq.ols  <- lm(log(ehatsq)~log(income), data=food)
+vari <- exp(fitted(sighatsq.ols))
+food.fgls <- lm(food_exp~income, weights=1/vari, data=food)
+```
+
+```{r}
+#| warning: FALSE
+stargazer(food.ols, food.HC1, food.wls, food.fgls, type="text",
+          column.labels=c("OLS","HC1","WLS","FGLS"),
+#          single.row = TRUE, 
+#          report = "vc*", 
+      header = FALSE,
+  dep.var.labels.include = FALSE,
+  model.numbers = FALSE,
+  dep.var.caption="Dependent variable: 'food expenditure'",
+  model.names=FALSE
+#          df=FALSE, 
+#          digits=2
+)
+```
+
+```{r}
+#| eval: FALSE
+stargazer(food.ols, food.HC1, food.wls, food.fgls,
+  header=FALSE, 
+  title="Comparing various 'food' models",
+  type=.stargazertype, # "html" or "latex" (in index.Rmd) 
+  keep.stat="n",  # what statistics to print
+  omit.table.layout="n",
+  star.cutoffs=NA,
+  digits=3, 
+#  single.row=TRUE,
+  intercept.bottom=FALSE, #moves the intercept coef to top
+  column.labels=c("OLS","HC1","WLS","FGLS"),
+  dep.var.labels.include = FALSE,
+  model.numbers = FALSE,
+  dep.var.caption="Dependent variable: 'food expenditure'",
+  model.names=FALSE,
+  star.char=NULL) #supresses the stars
+```
+
+## Challenge 2
+
+-   Lakukan Estimasi Regresi Linear OLS untuk data Pengeluaran Makanan dan Income
+-   Coba untuk melakukan Estimasi Regresi dari Isu/Permasalahan yang ditemukan dari Challenge 1

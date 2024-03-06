@@ -1,0 +1,79 @@
+# Pendahuluan
+
+## Pengenalan terhadap Model
+
+### Definisi Model
+
+-   Model: Wujud Gambaran dari Fenomena/Gejala Sebenarnya
+
+-   Peneliti menggunakan model untuk merekonstruksi **hubungan (baik telaah teoritis maupun empiris)** antar variabel.
+
+### Tujuan Model:
+
+-   Analisis (exploratory or Confirmatory)
+-   Peramalan (Forecasting)
+-   Evaluasi (Control, Evaluation)
+
+## Trade-off Modelling
+
+![](images/clipboard-3370361541.png)
+
+Menyeimbangkan antara idealisasi konsep dan penetapan Asumsi
+
+**Modelling: Seni Membangun model karena Sistem Dunia Nyata yang begitu kompleks**
+
+## Jenis Model
+
+-   Model Verbal/Logika
+-   Model Fisik
+-   Model Geometri
+-   Model Matematika
+    -   Model Deterministik
+    -   Model Stochastic Contoh: **Ekonometrika**
+
+## Ekonometrika
+
+### Definisi Ekonometrika
+
+-   Fenomena/Isu/Permasalahan yang **Dipetakan** berdasarkan teori ***Ekonomi*** yang ada
+-   **Dinyatakan** dengan persamaan/model ***Matematika***
+-   **Digunakan** Metode, Kriteria dan Prosedur ***Statistika*** untuk menganalisis permasalahan yang ada
+
+### Tujuan Ekonometrika
+
+-   Analisis Hubungan
+-   Peramalan
+-   Kontrol/Analisis Sebab Akibat (Causal)
+
+## Tahapan Ekonometrika
+
+-   Spesifikasi Model (termasuk: Identifikasi Masalah)
+-   Pengumpulan Data
+    -   Cross Section (Individu: n, periode: 1)
+    -   Time Series (Individu: 1, periode: t)
+    -   Pooled (Individu: n, periode: t)
+-   Estimasi Parameter
+-   Pengujian Hipotesis, Asumsi, dan Kelayakan Model
+-   Analisis/Interpretasi/Peramalan
+
+## Diskusi: Spesifikasi Model (termasuk Identifikasi Masalah)
+
+### Tips Mencari Isu/Masalah
+
+-   Memastikan Ketersediaan Data
+    -   Contoh sumber-sumber Data Sekunder:
+        -   Badan Pusat Statistik (bps.go.id)
+        -   Bank Indonesia (bi.go.id)
+        -   ASEAN Stats (aseanstats.org)
+        -   United Nations Statistical Division (unstats.un.org)
+        -   International Monetary Fund (imf.org)
+        -   World Bank (data.worldbank.org)
+-   Mencari Masalah dengan Cara Mengexplorasi Data
+
+### Isu/Permasalahan, Kendaraan, dan Merk Kendaraan
+
+![](images/clipboard-524715904.png)
+
+## Challenge 1
+
+-   Temukan Isu/Masalah yang menurut Bapak/Ibu/Saudara layak untuk dijadikan sebuah topik Penelitian.

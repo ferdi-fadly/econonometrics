@@ -1,0 +1,88 @@
+# Dynamic Panel Data Model
+
+## Introduction
+
+Linear dynamic panel data models account for dynamics and unobserved individual-specific heterogeneity. Due to the presence of lagged dependent variables, applying ordinary least squares including individual-specific dummy variables is inconsistent.
+
+## Model Specification
+
+$$y_{it}=\alpha y_{i,t-1}+\beta x_{i,t}+u_{i,t}$$
+$$u_{i,t}=\eta_i+\varepsilon_{i,t}$$
+$$y_{it}=\alpha y_{i,t-1}+\beta x_{i,t}+\eta_i+\varepsilon_{i,t}$$
+
+First Difference to elliminate $\eta_i$
+
+$$\Delta y_{it}=\alpha \Delta y_{i,t-1}+\beta \Delta x_{i,t}+\Delta \varepsilon_{i,t}$$
+
+## R implementation for Arrelano and Bond (1991)
+
+n=140 firms
+T=9
+
+```{r}
+
+library(plm)
+library(pdynmc)
+
+# Load Data
+data(EmplUK, package = "plm")
+dat <- EmplUK
+dat[,c(4:7)] <- log(dat[,c(4:7)])
+names(dat)[4:7] <- c("n", "w", "k", "ys")
+data.info(dat,i.name = "firm",t.name = "year") 
+```
+
+```{r}
+strucUPD.plot(dat,i.name = "firm",t.name = "year")
+```
+## Estimation
+
+```{r}
+m1 <- pdynmc(
+    dat = dat,
+    varname.i = "firm",
+    varname.t = "year",
+    use.mc.diff = TRUE, 
+    use.mc.lev = FALSE, 
+    use.mc.nonlin = FALSE,
+    include.y = TRUE,
+    varname.y = "n",
+    lagTerms.y = 2,
+    fur.con = TRUE,
+    fur.con.diff = TRUE,
+    fur.con.lev = FALSE,
+    varname.reg.fur = c("w", "k", "ys"),
+    lagTerms.reg.fur = c(1,2,2),
+    include.dum = TRUE,
+    dum.diff = TRUE,
+    dum.lev = FALSE,
+    varname.dum = "year",
+    w.mat = "iid.err",
+    std.err = "corrected",
+    estimation = "twostep",
+    opt.meth = "none"
+)
+summary(m1)
+```
+
+## Hypotheses Testing
+
+### Arrelano Bond Serial Correlation
+
+```{r}
+mtest.fct(m1,t.order = 2) 
+```
+The test does not reject the null hypothesis at any plausible significance level and provides no indication that the model specification might be inadequate.
+
+### Hansen J-test
+
+```{r}
+jtest.fct(m1)
+```
+
+### Wald Test
+
+```{r}
+wald.fct(m1,param = "all")
+```
+
